@@ -29,5 +29,14 @@ var _ = Describe("Bundle", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(filepath.Join(dir, "usr", "bin", "edgevpn")).To(BeARegularFile())
 		})
+
+		It("runs a container image to install", func() {
+			dir, err := os.MkdirTemp("", "test")
+			Expect(err).ToNot(HaveOccurred())
+			defer os.RemoveAll(dir)
+			err = RunBundles([]BundleOption{WithDBPath(dir), WithRootFS(dir), WithTarget("run://quay.io/kairos/community-bundles:kairos_latest")})
+			Expect(err).ToNot(HaveOccurred())
+			Expect(filepath.Join(dir, "var", "lib", "rancher", "k3s", "server", "manifests", "kairos-crds.yaml")).To(BeARegularFile())
+		})
 	})
 })
